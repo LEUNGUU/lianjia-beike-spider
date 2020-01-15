@@ -7,7 +7,7 @@
 # 3. 用浏览器打开生成的数据html文件
 
 import pandas as pd
-from pyecharts import Bar
+from pyecharts.charts import Bar
 
 import os
 import time
