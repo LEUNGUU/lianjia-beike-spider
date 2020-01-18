@@ -63,7 +63,7 @@ if __name__ == '__main__':
         import json
     elif database == "csv":
         csv_file = open("xiaoqu.csv", "w")
-        line = "{0};{1};{2};{3};{4};{5};{6}\n".format('city_ch', 'date', 'district', 'area', 'xiaoqu', 'price', 'sale')
+        line = "{0};{1};{2};{3};{4};{5};{6}\n".format('date', 'district', 'area', 'xiaoqu', 'layout', 'size', 'price')
         csv_file.write(line)
 
     city = get_city()
@@ -73,7 +73,7 @@ if __name__ == '__main__':
     # date = "20180331"   # 指定采集数据的日期
     # city = "sh"         # 指定采集数据的城市
     city_ch = get_chinese_city(city)
-    csv_dir = "{0}/{1}/xiaoqu/{2}/{3}".format(DATA_PATH, SPIDER_NAME, city, date)
+    csv_dir = "{0}/{1}/zufang/{2}/{3}".format(DATA_PATH, SPIDER_NAME, city, date)
 
     files = list()
     if not os.path.exists(csv_dir):
@@ -100,9 +100,9 @@ if __name__ == '__main__':
                 text = line.strip()
                 try:
                     # 如果小区名里面没有逗号，那么总共是6项
-                    if text.count(',') == 5:
-                        date, district, area, xiaoqu, price, sale = text.split(',')
-                    elif text.count(',') < 5:
+                    if text.count(',') == 6:
+                        date, district, area, xiaoqu, layout, size, price = text.split(',')
+                    elif text.count(',') < 6:
                         continue
                     else:
                         fields = text.split(',')
@@ -110,60 +110,64 @@ if __name__ == '__main__':
                         district = fields[1]
                         area = fields[2]
                         xiaoqu = ','.join(fields[3:-2])
-                        price = fields[-2]
-                        sale = fields[-1]
+                        layout = fields[-3]
+                        size = fields[-2]
+                        price = fields[-1]
                 except Exception as e:
                     print(text)
                     print(e)
                     continue
-                sale = sale.replace(r'套在售二手房', '')
                 price = price.replace(r'暂无', '0')
-                price = price.replace(r'元/m2', '')
+                price = price.replace(r'元', '')
                 price = int(price)
                 sale = int(sale)
-                print("{0} {1} {2} {3} {4} {5}".format(date, district, area, xiaoqu, price, sale))
+                print("{0} {1} {2} {3} {4} {5} {6}".format(date, district, area, xiaoqu, layout, size, price))
                 # 写入mysql数据库
                 if database == "mysql":
-                    db.query('INSERT INTO xiaoqu (city, date, district, area, xiaoqu, price, sale) '
-                             'VALUES(:city, :date, :district, :area, :xiaoqu, :price, :sale)',
-                             city=city_ch, date=date, district=district, area=area, xiaoqu=xiaoqu, price=price,
-                             sale=sale)
+                    # db.query('INSERT INTO xiaoqu (city, date, district, area, xiaoqu, price, sale) '
+                             # 'VALUES(:city, :date, :district, :area, :xiaoqu, :price, :sale)',
+                             # city=city_ch, date=date, district=district, area=area, xiaoqu=xiaoqu, price=price,
+                             # sale=sale)
+                    pass
                 # 写入mongodb数据库
                 elif database == "mongodb":
-                    data = dict(city=city_ch, date=date, district=district, area=area, xiaoqu=xiaoqu, price=price,
-                                sale=sale)
-                    collection.insert(data)
+                    # data = dict(city=city_ch, date=date, district=district, area=area, xiaoqu=xiaoqu, price=price,
+                                # sale=sale)
+                    # collection.insert(data)
+                    pass
                 elif database == "excel":
                     if not PYTHON_3:
-                        worksheet.write_string(row, col, unicode(city_ch, 'utf-8'))
+                        worksheet.write_string(row, col, unicode(district, 'utf-8'))
                         worksheet.write_string(row, col + 1, date)
-                        worksheet.write_string(row, col + 2, unicode(district, 'utf-8'))
-                        worksheet.write_string(row, col + 3, unicode(area, 'utf-8'))
-                        worksheet.write_string(row, col + 4, unicode(xiaoqu, 'utf-8'))
-                        worksheet.write_number(row, col + 5, price)
-                        worksheet.write_number(row, col + 6, sale)
+                        worksheet.write_string(row, col + 2, unicode(area, 'utf-8'))
+                        worksheet.write_string(row, col + 3, unicode(xiaoqu, 'utf-8'))
+                        worksheet.write_string(row, col + 4, unicode(layout, 'utf-8'))
+                        worksheet.write_number(row, col + 5, unicode(size, 'utf-8')
+                        worksheet.write_number(row, col + 6, price)
                     else:
-                        worksheet.write_string(row, col, city_ch)
+                        worksheet.write_string(row, col, district)
                         worksheet.write_string(row, col + 1, date)
-                        worksheet.write_string(row, col + 2, district)
-                        worksheet.write_string(row, col + 3, area)
-                        worksheet.write_string(row, col + 4, xiaoqu)
-                        worksheet.write_number(row, col + 5, price)
-                        worksheet.write_number(row, col + 6, sale)
+                        worksheet.write_string(row, col + 2, area)
+                        worksheet.write_string(row, col + 3, xiaoqu)
+                        worksheet.write_string(row, col + 4, layout)
+                        worksheet.write_string(row, col + 5, size)
+                        worksheet.write_number(row, col + 6, price)
                     row += 1
                 elif database == "json":
-                    data = dict(city=city_ch, date=date, district=district, area=area, xiaoqu=xiaoqu, price=price,
-                                sale=sale)
-                    datas.append(data)
+                    pass
+                    # data = dict(city=city_ch, date=date, district=district, area=area, xiaoqu=xiaoqu, price=price,
+                                # sale=sale)
+                    # datas.append(data)
                 elif database == "csv":
-                    line = "{0};{1};{2};{3};{4};{5};{6}\n".format(city_ch, date, district, area, xiaoqu, price, sale)
-                    csv_file.write(line)
+                    pass
+                    # line = "{0};{1};{2};{3};{4};{5};{6}\n".format(city_ch, date, district, area, xiaoqu, price, sale)
+                    # csv_file.write(line)
 
     # 写入，并且关闭句柄
     if database == "excel":
         workbook.close()
     elif database == "json":
-        json.dump(datas, open('xiaoqu.json', 'w'), ensure_ascii=False, indent=2)
+        json.dump(datas, open('zufang.json', 'w'), ensure_ascii=False, indent=2)
     elif database == "csv":
         csv_file.close()
 
