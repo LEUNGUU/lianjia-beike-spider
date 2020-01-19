@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# coding=utf-8
+# -*- coding: utf-8 -*-
 # author: zengyuetian
 # 此代码仅供学习与交流，请勿用于商业用途。
 # 城市缩写和城市名的映射
